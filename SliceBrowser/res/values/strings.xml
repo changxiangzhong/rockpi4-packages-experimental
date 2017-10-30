@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_label">Slice Presenter</string>
+    <string name="app_label">Slice Browser</string>
 
     <string name="intent_button">Use Intent Slice</string>
     <string name="uri_button">Use URI Slice</string>
