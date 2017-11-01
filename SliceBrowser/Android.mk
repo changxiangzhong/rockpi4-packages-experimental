@@ -16,9 +16,14 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
+LOCAL_USE_AAPT2 := true
+
 LOCAL_PACKAGE_NAME := SlicePresenter
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
-	$(call all-Iaidl-files-under, src)
+    $(call all-Iaidl-files-under, src)
+
+LOCAL_STATIC_ANDROID_LIBRARIES := \
+    android-support-v7-cardview
 
 LOCAL_CERTIFICATE := platform
 
