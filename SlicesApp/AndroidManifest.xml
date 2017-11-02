@@ -36,6 +36,7 @@
                     android:host="com.android.experimental.slicesapp"
                     android:pathPrefix="/main" />
             </intent-filter>
+
             <meta-data android:name="android.metadata.SLICE_URI"
                 android:value="content://com.android.experimental.slicesapp/main" />
         </activity>
@@ -44,10 +45,17 @@
                 android:authorities="com.android.experimental.slicesapp"
                 android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW_SLICE" />
-                <action android:name="android.intent.action.EXAMPLE_ACTION" />
+                <action android:name="android.intent.action.EXAMPLE_SLICE_INTENT" />
             </intent-filter>
         </provider>
+
+        <receiver
+            android:name=".SlicesBroadcastReceiver"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.EXAMPLE_SLICE_ACTION"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 

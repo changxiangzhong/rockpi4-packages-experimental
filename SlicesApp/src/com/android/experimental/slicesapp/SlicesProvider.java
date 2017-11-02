@@ -22,7 +22,6 @@ import android.app.slice.SliceProvider;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.text.format.DateUtils;
@@ -34,7 +33,9 @@ import java.util.function.Consumer;
 public class SlicesProvider extends SliceProvider {
 
     private static final String TAG = "SliceProvider";
-    private static final String INTENT_ACTION = "android.intent.action.EXAMPLE_ACTION";
+    public static final String SLICE_INTENT = "android.intent.action.EXAMPLE_SLICE_INTENT";
+    public static final String SLICE_ACTION = "android.intent.action.EXAMPLE_SLICE_ACTION";
+    public static final String INTENT_ACTION_EXTRA = "android.intent.slicesapp.INTENT_ACTION_EXTRA";
 
     private final int NUM_LIST_ITEMS = 10;
 
@@ -56,7 +57,7 @@ public class SlicesProvider extends SliceProvider {
 
     //@Override
     public Uri onMapIntentToUri(Intent intent) {
-        if (intent.getAction().equals(INTENT_ACTION)) {
+        if (intent.getAction().equals(SLICE_INTENT)) {
             return getIntentUri();
         }
         return null;//super.onMapIntentToUri(intent);
@@ -84,32 +85,26 @@ public class SlicesProvider extends SliceProvider {
             type = "Intent";
         }
         switch (type) {
-            case "Shortcut":
-                b.addColor(Color.CYAN).addIcon(
-                        Icon.createWithResource(getContext(), R.drawable.mady),
-                        Slice.HINT_LARGE);
-                break;
             case "Single-line":
                 b.addSubSlice(makeList(new Slice.Builder(b), this::makeSingleLine,
                         this::addIcon));
-                addColorIcon(b);
+                addPrimaryAction(b);
                 break;
             case "Single-line action":
                 b.addSubSlice(makeList(new Slice.Builder(b), this::makeSingleLine,
                         this::addAltActions));
-                addColorIcon(b);
+                addPrimaryAction(b);
                 break;
             case "Two-line":
                 b.addSubSlice(makeList(new Slice.Builder(b), this::makeTwoLine,
                         this::addIcon));
-                addColorIcon(b);
+                addPrimaryAction(b);
                 break;
             case "Two-line action":
                 b.addSubSlice(makeList(new Slice.Builder(b), this::makeTwoLine,
                         this::addAltActions));
-                addColorIcon(b);
+                addPrimaryAction(b);
                 break;
-            case "Grid":
             case "Weather":
                 b.addSubSlice(createWeather(new Slice.Builder(b)));
                 break;
@@ -124,6 +119,12 @@ public class SlicesProvider extends SliceProvider {
                 break;
             case "Intent":
                 b.addSubSlice(createIntentSlice(new Slice.Builder(b)));
+                break;
+            case "Settings":
+                createSettingsSlice(b);
+                break;
+            case "Settings content":
+                createSettingsContentSlice(b);
                 break;
         }
         if (mSharedPrefs.getBoolean("show_action_row", false)) {
@@ -150,23 +151,28 @@ public class SlicesProvider extends SliceProvider {
     private Slice createWeather(Builder grid) {
         grid.addHints(Slice.HINT_HORIZONTAL);
         grid.addSubSlice(new Slice.Builder(grid)
-                .addIcon(Icon.createWithResource(getContext(), R.drawable.weather_1))
+                .addIcon(Icon.createWithResource(getContext(), R.drawable.weather_1),
+                        Slice.HINT_LARGE)
                 .addText("MON")
                 .addText("69\u00B0", Slice.HINT_LARGE).build());
         grid.addSubSlice(new Slice.Builder(grid)
-                .addIcon(Icon.createWithResource(getContext(), R.drawable.weather_2))
+                .addIcon(Icon.createWithResource(getContext(), R.drawable.weather_2),
+                        Slice.HINT_LARGE)
                 .addText("TUE")
                 .addText("71\u00B0", Slice.HINT_LARGE).build());
         grid.addSubSlice(new Slice.Builder(grid)
-                .addIcon(Icon.createWithResource(getContext(), R.drawable.weather_3))
+                .addIcon(Icon.createWithResource(getContext(), R.drawable.weather_3),
+                        Slice.HINT_LARGE)
                 .addText("WED")
                 .addText("76\u00B0", Slice.HINT_LARGE).build());
         grid.addSubSlice(new Slice.Builder(grid)
-                .addIcon(Icon.createWithResource(getContext(), R.drawable.weather_4))
+                .addIcon(Icon.createWithResource(getContext(), R.drawable.weather_4),
+                        Slice.HINT_LARGE)
                 .addText("THU")
                 .addText("69\u00B0", Slice.HINT_LARGE).build());
         grid.addSubSlice(new Slice.Builder(grid)
-                .addIcon(Icon.createWithResource(getContext(), R.drawable.weather_2))
+                .addIcon(Icon.createWithResource(getContext(), R.drawable.weather_2),
+                        Slice.HINT_LARGE)
                 .addText("FRI")
                 .addText("71\u00B0", Slice.HINT_LARGE).build());
         return grid.build();
@@ -178,7 +184,8 @@ public class SlicesProvider extends SliceProvider {
                 .addHints(Slice.HINT_MESSAGE)
                 .addText("yo home \uD83C\uDF55, I emailed you the info")
                 .addTimestamp(System.currentTimeMillis() - 20 * DateUtils.MINUTE_IN_MILLIS)
-                .addIcon(Icon.createWithResource(getContext(), R.drawable.mady), Slice.HINT_SOURCE)
+                .addIcon(Icon.createWithResource(getContext(), R.drawable.mady), Slice.HINT_SOURCE,
+                        Slice.HINT_TITLE, Slice.HINT_LARGE)
                 .build());
         b2.addSubSlice(new Builder(b2)
                 .addHints(Slice.HINT_MESSAGE)
@@ -190,7 +197,8 @@ public class SlicesProvider extends SliceProvider {
                 .addText("yay! can't wait for getContext() weekend!\n"
                         + "\uD83D\uDE00")
                 .addTimestamp(System.currentTimeMillis() - 5 * DateUtils.MINUTE_IN_MILLIS)
-                .addIcon(Icon.createWithResource(getContext(), R.drawable.mady), Slice.HINT_SOURCE)
+                .addIcon(Icon.createWithResource(getContext(), R.drawable.mady), Slice.HINT_SOURCE,
+                        Slice.HINT_LARGE)
                 .build());
         RemoteInput ri = new RemoteInput.Builder("someKey").setLabel("someLabel")
                 .setAllowFreeFormInput(true).build();
@@ -226,9 +234,15 @@ public class SlicesProvider extends SliceProvider {
         b.addText("Secondary text");
     }
 
-    private void addColorIcon(Builder b) {
-        b.addColor(0xFFFF5722);
-        b.addIcon(Icon.createWithResource(getContext(), R.drawable.ic_slice));
+    private void addPrimaryAction(Builder b) {
+        Intent intent = new Intent(getContext(), SlicesActivity.class);
+        PendingIntent pi = PendingIntent.getActivity(getContext(), 0, intent, 0);
+        b.addSubSlice(new Slice.Builder(b).addAction(pi,
+                new Slice.Builder(b).addColor(0xFFFF5722)
+                        .addIcon(Icon.createWithResource(getContext(), R.drawable.ic_slice),
+                                Slice.HINT_TITLE)
+                        .addText("Slice App", Slice.HINT_TITLE)
+                        .build()).addHints(Slice.HINT_HIDDEN, Slice.HINT_TITLE).build());
     }
 
     private Slice makeList(Builder list, Consumer<Builder> lineCreator,
@@ -270,8 +284,7 @@ public class SlicesProvider extends SliceProvider {
     private Slice createMapsMulti(Builder b) {
         Intent intent = new Intent(getContext(), SlicesActivity.class);
         PendingIntent pi = PendingIntent.getActivity(getContext(), 0, intent, 0);
-
-        b.addHints(Slice.HINT_HORIZONTAL, Slice.HINT_LIST).addColor(0xff0B8043);
+        b.addHints(Slice.HINT_HORIZONTAL, Slice.HINT_LIST);
         b.addSubSlice(new Slice.Builder(b)
                 .addAction(pi, new Slice.Builder(b)
                         .addIcon(Icon.createWithResource(getContext(), R.drawable.ic_home)).build())
@@ -284,9 +297,10 @@ public class SlicesProvider extends SliceProvider {
                 .addText("1 hour 23 min").build());
         b.addSubSlice(new Slice.Builder(b)
                 .addAction(pi, new Slice.Builder(b)
-                        .addIcon(Icon.createWithResource(getContext(), R.drawable.ic_home)).build())
+                        .addIcon(Icon.createWithResource(getContext(), R.drawable.ic_car)).build())
                 .addText("Mom's", Slice.HINT_LARGE)
                 .addText("37 min").build());
+        b.addColor(0xff0B8043);
         return b.build();
     }
 
@@ -309,5 +323,40 @@ public class SlicesProvider extends SliceProvider {
                         .addIcon(Icon.createWithResource(getContext(), R.drawable.ic_prev)).build())
                 .addText("Previous", Slice.HINT_LARGE).build());
         return b.build();
+    }
+
+    private Slice.Builder createSettingsSlice(Builder b) {
+        b.addSubSlice(new Slice.Builder(b)
+                .addAction(getIntent("toggled"), new Slice.Builder(b)
+                        .addText("Wi-fi")
+                        .addText("GoogleGuest")
+                        .addHints(Slice.HINT_TOGGLE, Slice.HINT_SELECTED)
+                        .build())
+                .build());
+        return b;
+    }
+
+    private Slice.Builder createSettingsContentSlice(Builder b) {
+        b.addSubSlice(new Slice.Builder(b)
+                .addAction(getIntent("main content"),
+                        new Slice.Builder(b)
+                                .addText("Wi-fi")
+                                .addText("GoogleGuest")
+                                .build())
+                .addAction(getIntent("toggled"),
+                        new Slice.Builder(b)
+                                .addHints(Slice.HINT_TOGGLE, Slice.HINT_SELECTED)
+                                .build())
+                .build());
+        return b;
+    }
+
+    private PendingIntent getIntent(String message) {
+        Intent intent = new Intent(SLICE_ACTION);
+        intent.setClass(getContext(), SlicesBroadcastReceiver.class);
+        intent.putExtra(INTENT_ACTION_EXTRA, message);
+        PendingIntent pi = PendingIntent.getBroadcast(getContext(), 0, intent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        return pi;
     }
 }

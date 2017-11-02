@@ -60,7 +60,6 @@ public class SlicePresenter extends Activity {
     private ArrayList<Uri> mSliceUris = new ArrayList<Uri>();
     private String mSelectedMode;
     private ViewGroup mContainer;
-    private boolean mShowingIntentSlice;
     private SearchView mSearchView;
     private SimpleCursorAdapter mAdapter;
     private SubMenu mTypeMenu;
