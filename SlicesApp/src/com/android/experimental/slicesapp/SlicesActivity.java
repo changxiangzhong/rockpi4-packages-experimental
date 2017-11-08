@@ -15,7 +15,6 @@
 package com.android.experimental.slicesapp;
 
 import android.app.Activity;
-import android.app.slice.widget.SliceView;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,8 +35,6 @@ import java.util.List;
 public class SlicesActivity extends Activity {
 
     private static final String TAG = "SlicesActivity";
-
-    private boolean SHOW_PREVIEW = false;
 
     private int mState;
     private ViewGroup mSlicePreviewFrame;
@@ -131,12 +128,5 @@ public class SlicesActivity extends Activity {
     }
 
     private void updateSlice(Uri uri) {
-        if (SHOW_PREVIEW) {
-            mSlicePreviewFrame.removeAllViews();
-            SliceView v = new SliceView(this);
-            v.setMode(SliceView.MODE_LARGE);
-            v.setSlice(uri);
-            mSlicePreviewFrame.addView(v);
-        }
     }
 }
