@@ -17,7 +17,9 @@ package com.android.experimental.slicesapp;
 import android.app.Activity;
 import android.app.slice.widget.SliceView;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -63,6 +65,12 @@ public class SlicesActivity extends Activity {
             state.edit().putString(getUri().toString(), String.valueOf(mState)).commit();
             updateState();
             getContentResolver().notifyChange(getUri(), null);
+        });
+        findViewById(R.id.auth).setOnClickListener(v -> {
+            List<ApplicationInfo> packages = getPackageManager().getInstalledApplications(0);
+            packages.forEach(info -> grantUriPermission(info.packageName, getUri(),
+                    Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                            | Intent.FLAG_GRANT_WRITE_URI_PERMISSION));
         });
 
         Spinner spinner = findViewById(R.id.spinner);
