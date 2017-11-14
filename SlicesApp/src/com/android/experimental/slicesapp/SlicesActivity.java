@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -31,7 +30,6 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,12 +78,12 @@ public class SlicesActivity extends Activity {
         list.add("Single-line action");
         list.add("Two-line");
         list.add("Two-line action");
-        list.add("Grid");
         list.add("Weather");
         list.add("Messaging");
-        list.add("Shortcut");
         list.add("Keep actions");
         list.add("Maps multi");
+        list.add("Settings");
+        list.add("Settings content");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
